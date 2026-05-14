@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회의 결과 보고서</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            color-scheme: light;
+        }
+
+        html.dark-mode {
+            color-scheme: dark;
+        }
+
+        body {
+            font-family: 'MS Sans Serif', Arial, sans-serif;
+            padding: 40px 20px;
+            background: #000000;
+            min-height: 100vh;
+            color: #000000;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* 모드 토글 - 숨김 */
+        .theme-toggle {
+            display: none;
+        }
+
+        .header-nav {
+            margin-bottom: 30px;
+        }
+
+        .back-link {
+            color: #0000ff;
+            text-decoration: underline;
+            font-size: 16px;
+            font-weight: 400;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: none;
+            opacity: 1;
+        }
+
+        .back-link:hover {
+            opacity: 1;
+            transform: none;
+        }
+
+        /* 윈도우 98 스타일 카드 */
+        .card {
+            background: #c0c0c0;
+            border: 2px solid;
+            border-color: #dfdfdf #808080 #808080 #dfdfdf;
+            border-radius: 0;
+            padding: 32px;
+            box-shadow: none;
+            color: #000000;
+            margin-bottom: 24px;
+            transition: none;
+        }
+
+        .card:hover {
+            background: #c0c0c0;
+            box-shadow: none;
+        }
+
+        .card h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+            font-weight: 700;
+            color: #000000;
+            text-shadow: none;
+        }
+
+        .card h2 {
+            font-size: 20px;
+            margin: 24px 0 16px 0;
+            font-weight: 600;
+            border-bottom: 1px solid #808080;
+            padding-bottom: 12px;
+            color: #000000;
+        }
+
+        /* 기본 정보 */
+        .meeting-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .info-item {
+            background: #ffffff;
+            padding: 16px;
+            border-radius: 0;
+            border: 1px solid #808080;
+            transition: none;
+        }
+
+        .info-item:hover {
+            background: #ffffff;
+            border-color: #808080;
+        }
+
+        .info-label {
+            font-size: 12px;
+            opacity: 1;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+            color: #000000;
+        }
+
+        .info-value {
+            font-size: 16px;
+            font-weight: 500;
+            color: #000000;
+        }
+
+        /* 논의 내용 */
+        .summary-section {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 0;
+            margin-bottom: 24px;
+            border: 1px solid #808080;
+        }
+
+        .summary-text {
+            font-size: 15px;
+            line-height: 1.8;
+            color: #000000;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        /* 액션 아이템 테이블 */
+        .action-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+        }
+
+        .action-table th {
+            background: #c0c0c0;
+            color: #000000;
+            padding: 14px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 1px solid #808080;
+            font-size: 14px;
+        }
+
+        .action-table td {
+            padding: 14px;
+            border-bottom: 1px solid #dfdfdf;
+            font-size: 14px;
+            color: #000000;
+        }
+
+        .action-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .action-table tbody tr:hover {
+            background: #ffffff;
+        }
+
+        .owner {
+            font-weight: 600;
+            color: #000000;
+        }
+
+        .deadline {
+            color: #000000;
+            font-weight: 500;
+        }
+
+        /* 인쇄 스타일 */
+        @media print {
+            body {
+                background: white;
+                padding: 20px;
+            }
+
+            .theme-toggle {
+                display: none;
+            }
+
+            .header-nav {
+                display: none;
+            }
+
+            .card {
+                background: white;
+                border: 1px solid #ddd;
+                box-shadow: none;
+                color: #333;
+                page-break-inside: avoid;
+            }
+
+            .card h1, .card h2, .info-value {
+                color: #333;
+            }
+
+            .card h2 {
+                border-bottom-color: #ddd;
+            }
+
+            .info-item {
+                background: #f8f9fa;
+                border-left-color: #667eea;
+            }
+
+            .summary-section {
+                background: #f8f9fa;
+                border-left-color: #667eea;
+            }
+
+            .summary-text {
+                color: #333;
+            }
+
+            .action-table th {
+                background: #e8e8e8;
+                color: #333;
+                border-bottom-color: #ddd;
+            }
+
+            .action-table td {
+                color: #333;
+                border-bottom-color: #ddd;
+            }
+
+            .owner {
+                color: #667eea;
+            }
+
+            .deadline {
+                color: #e74c3c;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0;
+            }
+
+            .card {
+                border-radius: 12px;
+                padding: 20px;
+            }
+
+            .card h1 {
+                font-size: 24px;
+            }
+
+            .card h2 {
+                font-size: 18px;
+            }
+
+            .theme-toggle {
+                width: 45px;
+                height: 45px;
+                font-size: 20px;
+            }
+
+            .action-table {
+                font-size: 13px;
+            }
+
+            .action-table th, .action-table td {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" id="themeToggle" aria-label="모드 전환">☀️</button>
+
+    <div class="container">
+        <div class="header-nav">
+            <a href="dashboard.html" class="back-link">← 대시보드로 돌아가기</a>
+        </div>
+
+        <div class="card">
+            <h1>📋 회의 결과 보고서</h1>
+
+            <!-- 회의 기본 정보 -->
+            <div class="meeting-info">
+                <div class="info-item">
+                    <div class="info-label">회의명</div>
+                    <div class="info-value">마케팅팀 주간회의</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">날짜</div>
+                    <div class="info-value">2026년 3월 10일 (월)</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">참석자</div>
+                    <div class="info-value">김대리, 이과장, 박사원, 정팀장</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>📌 논의 내용 요약</h2>
+            <div class="summary-section">
+                <div class="summary-text">• SNS 광고 캠페인 A/B 테스트 결과 분석 완료
+  - B안(영상형)이 A안(이미지형) 대비 클릭률 2.3배 우수
+  - B안 기반 광고 전략으로 방향 확정
+
+• 콘텐츠 제작 및 협업 진행 현황
+  - 블로그 콘텐츠 3건 발행 완료
+  - 인플루언서 협업 제안서 3곳 발송, 1곳 회신 (푸드스타일리 김OO)
+
+• 4월 신제품 런칭 전략 논의
+  - 사전 티저 콘텐츠 시작 시점 결정 필요
+  - 경쟁사 C사 신규 캠페인 분석 진행</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>✅ 액션 아이템</h2>
+            <table class="action-table">
+                <thead>
+                    <tr>
+                        <th style="width: 15%;">담당자</th>
+                        <th style="width: 50%;">할 일</th>
+                        <th style="width: 35%;">기한</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="owner">김대리</span></td>
+                        <td>3월 프로모션 기획안 초안 작성</td>
+                        <td><span class="deadline">2026년 3월 12일 (수)</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="owner">이과장</span></td>
+                        <td>인플루언서 미팅 일정 잡기</td>
+                        <td><span class="deadline">2026년 3월 14일 (금)</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="owner">박사원</span></td>
+                        <td>B안 기반으로 영상 광고 3개 추가 제작</td>
+                        <td><span class="deadline">2026년 3월 14일 (금)</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="owner">박사원</span></td>
+                        <td>경쟁사 C사 신규 캠페인 분석</td>
+                        <td>진행 중</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const themeToggle = document.getElementById('themeToggle');
+        const htmlElement = document.documentElement;
+        const savedTheme = localStorage.getItem('theme') || 'light';
+
+        // 초기 테마 설정
+        if (savedTheme === 'dark') {
+            htmlElement.classList.add('dark-mode');
+            themeToggle.textContent = '🌙';
+        } else {
+            themeToggle.textContent = '☀️';
+        }
+
+        // 토글 클릭 이벤트
+        themeToggle.addEventListener('click', () => {
+            htmlElement.classList.toggle('dark-mode');
+            const isDarkMode = htmlElement.classList.contains('dark-mode');
+            localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+            themeToggle.textContent = isDarkMode ? '🌙' : '☀️';
+        });
+    </script>
+</body>
+</html>

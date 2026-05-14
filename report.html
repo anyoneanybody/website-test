@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SubTrackr 사이트 분석 리포트</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            color-scheme: light;
+        }
+
+        html.dark-mode {
+            color-scheme: dark;
+        }
+
+        body {
+            font-family: 'MS Sans Serif', Arial, sans-serif;
+            padding: 30px 20px;
+            background: #000000;
+            min-height: 100vh;
+            color: #000000;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* 모드 토글 - 숨김 */
+        .theme-toggle {
+            display: none;
+        }
+
+        .header-nav {
+            margin-bottom: 30px;
+        }
+
+        .back-link {
+            color: #0000ff;
+            text-decoration: underline;
+            font-size: 16px;
+            font-weight: 400;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: none;
+            opacity: 1;
+        }
+
+        .back-link:hover {
+            opacity: 1;
+            transform: none;
+        }
+
+        h1 {
+            color: #000000;
+            font-size: 32px;
+            margin-bottom: 12px;
+            text-shadow: none;
+        }
+
+        .report-subtitle {
+            color: #000000;
+            font-size: 16px;
+            margin-bottom: 40px;
+            opacity: 1;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        /* 윈도우 98 스타일 카드 */
+        .card {
+            background: #c0c0c0;
+            border: 2px solid;
+            border-color: #dfdfdf #808080 #808080 #dfdfdf;
+            border-radius: 0;
+            padding: 28px;
+            box-shadow: none;
+            color: #000000;
+            transition: none;
+        }
+
+        .card:hover {
+            background: #c0c0c0;
+            box-shadow: none;
+            transform: none;
+        }
+
+        .card h2 {
+            font-size: 20px;
+            margin-bottom: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #000000;
+        }
+
+        .card ul {
+            list-style: none;
+            margin: 0;
+        }
+
+        .card li {
+            padding: 8px 0;
+            padding-left: 24px;
+            position: relative;
+            font-size: 15px;
+            line-height: 1.6;
+            color: #000000;
+        }
+
+        .card li:before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: #000000;
+        }
+
+        .card p {
+            font-size: 15px;
+            line-height: 1.7;
+            color: #000000;
+            margin-bottom: 12px;
+        }
+
+        .card p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* 색상 구분 */
+        .card.structure {
+            border-left: 2px solid #000000;
+        }
+
+        .card.design {
+            border-left: 2px solid #000000;
+        }
+
+        .card.features {
+            border-left: 2px solid #000000;
+        }
+
+        .card.strength {
+            border-left: 2px solid #000000;
+        }
+
+        .card.improvement {
+            border-left: 2px solid #000000;
+        }
+
+        .score-section {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 0;
+            margin-top: 16px;
+            border: 1px solid #808080;
+        }
+
+        .score-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            font-size: 14px;
+            color: #000000;
+        }
+
+        .score-bar {
+            width: 150px;
+            height: 6px;
+            background: #dfdfdf;
+            border-radius: 0;
+            overflow: hidden;
+            border: 1px solid #808080;
+        }
+
+        .score-fill {
+            height: 100%;
+            background: #000080;
+            border-radius: 0;
+        }
+
+        .highlight {
+            color: #000000;
+            font-weight: 600;
+        }
+
+        .source {
+            text-align: center;
+            color: #000000;
+            font-size: 13px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #808080;
+        }
+
+        @media (max-width: 768px) {
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .theme-toggle {
+                width: 45px;
+                height: 45px;
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" id="themeToggle" aria-label="모드 전환">☀️</button>
+
+    <div class="container">
+        <div class="header-nav">
+            <a href="dashboard.html" class="back-link">← 대시보드로 돌아가기</a>
+        </div>
+
+        <h1>🔍 SubTrackr 사이트 분석 리포트</h1>
+        <p class="report-subtitle">구독 관리 플랫폼의 UX/UI 및 서비스 분석</p>
+
+        <div class="cards-grid">
+            <!-- 사이트 구조 -->
+            <div class="card structure">
+                <h2>🏗️ 사이트 구조</h2>
+                <ul>
+                    <li>헤더: 로그인 / 설정 버튼 우측 상단 배치</li>
+                    <li>히어로 섹션: 핵심 메시지 + CTA 버튼</li>
+                    <li>대시보드 영역: 통계 카드 (3개 섹션)</li>
+                    <li>액션 섹션: AI 감지 / 새 구독 추가</li>
+                    <li>구독 관리 인터페이스: 필터 & 버튼 그룹</li>
+                    <li>블로그 섹션: 구독 관리 팁 및 가이드</li>
+                </ul>
+            </div>
+
+            <!-- 디자인 분석 -->
+            <div class="card design">
+                <h2>🎨 디자인 특징</h2>
+                <p><strong>색상:</strong> 다크모드 기반, 주황색/파란색 강조</p>
+                <p><strong>배경:</strong> 순흑색(#000) - 고대비, 세련됨</p>
+                <p><strong>강조색:</strong> 주황색 그라디언트 (#ff8c42)</p>
+                <p><strong>타이포그래피:</strong> 산세리프, 명확한 계층 구조</p>
+                <p><strong>레이아웃:</strong> 카드 기반, 충분한 여백, 반응형</p>
+                <p><strong>아이콘:</strong> 정보 제공용 인포마크(ⓘ) 활용</p>
+            </div>
+
+            <!-- 주요 기능 -->
+            <div class="card features">
+                <h2>⚡ 주요 기능</h2>
+                <ul>
+                    <li><strong>구독 자동 감지:</strong> AI로 영수증 이미지 분석</li>
+                    <li><strong>월간 지출 추적:</strong> 한눈에 보는 월별 금액</li>
+                    <li><strong>절감 가능액 제시:</strong> 불필요한 구독 판단 가능</li>
+                    <li><strong>구독 수 관리:</strong> 현재 활성 구독 카운팅</li>
+                    <li><strong>블로그 팁:</strong> 구독료 절약 가이드</li>
+                    <li><strong>은행연동 불필요:</strong> 스크린샷만으로 추적</li>
+                </ul>
+            </div>
+
+            <!-- 잘한 점 -->
+            <div class="card strength">
+                <h2>✅ 강점 및 잘한 점</h2>
+                <ul>
+                    <li><strong>깔끔한 대시보드:</strong> 핵심 정보 한눈에 파악</li>
+                    <li><strong>다크모드 기본:</strong> 눈 건강 배려, 세련된 느낌</li>
+                    <li><strong>명확한 CTA:</strong> 다음 단계가 명확함</li>
+                    <li><strong>한글 인터페이스:</strong> 한국 사용자 맞춤</li>
+                    <li><strong>AI 기반 자동화:</strong> 사용자 편의성 극대화</li>
+                    <li><strong>정보 아이콘 활용:</strong> 추가 정보 접근성 좋음</li>
+                </ul>
+            </div>
+
+            <!-- 개선점 -->
+            <div class="card improvement">
+                <h2>💡 개선 제안</h2>
+                <ul>
+                    <li><strong>기능 설명 강화:</strong> 각 기능별 자세한 설명 필요</li>
+                    <li><strong>무료/유료 구분:</strong> 요금제 명시 필요</li>
+                    <li><strong>보안 정보:</strong> 데이터 보호 정책 강조</li>
+                    <li><strong>FAQ 섹션:</strong> 자주 묻는 질문 추가</li>
+                    <li><strong>사용 사례:</strong> 실제 사용자 사례 추가</li>
+                    <li><strong>온보딩 개선:</strong> 초기 사용자 가이드 강화</li>
+                </ul>
+            </div>
+
+            <!-- 평가 지표 -->
+            <div class="card" style="grid-column: span 2;">
+                <h2>📊 종합 평가</h2>
+                <div class="score-section">
+                    <div class="score-item">
+                        <span>사용자 경험 (UX)</span>
+                        <div class="score-bar">
+                            <div class="score-fill" style="width: 88%;"></div>
+                        </div>
+                        <span>8.8/10</span>
+                    </div>
+                    <div class="score-item">
+                        <span>시각 디자인 (UI)</span>
+                        <div class="score-bar">
+                            <div class="score-fill" style="width: 87%;"></div>
+                        </div>
+                        <span>8.7/10</span>
+                    </div>
+                    <div class="score-item">
+                        <span>기능 충실도</span>
+                        <div class="score-bar">
+                            <div class="score-fill" style="width: 82%;"></div>
+                        </div>
+                        <span>8.2/10</span>
+                    </div>
+                    <div class="score-item">
+                        <span>가치 제안 명확성</span>
+                        <div class="score-bar">
+                            <div class="score-fill" style="width: 85%;"></div>
+                        </div>
+                        <span>8.5/10</span>
+                    </div>
+                    <div class="score-item">
+                        <span>정보 아키텍처</span>
+                        <div class="score-bar">
+                            <div class="score-fill" style="width: 86%;"></div>
+                        </div>
+                        <span>8.6/10</span>
+                    </div>
+                    <div class="score-item" style="border-top: 1px solid rgba(255, 255, 255, 0.2); padding-top: 12px; margin-top: 12px;">
+                        <strong>종합 평가</strong>
+                        <div class="score-bar">
+                            <div class="score-fill" style="width: 86%;"></div>
+                        </div>
+                        <span style="font-weight: 600; color: #ffa500;">8.6/10</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 추가 인사이트 -->
+            <div class="card" style="grid-column: span 2;">
+                <h2>💬 추가 인사이트</h2>
+                <p><strong>대상 사용자:</strong> 구독 서비스 관리에 피로를 느끼는 개인 사용자</p>
+                <p><strong>핵심 강점:</strong> <span class="highlight">은행 연동 없는 프라이버시 친화적 접근</span> + <span class="highlight">AI 자동화</span></p>
+                <p><strong>경쟁 우위:</strong> 한국어 지원, 다크모드 기본, 절감액 제시 기능</p>
+                <p><strong>추천 개선 우선순위:</strong></p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li>1순위: 무료/유료 요금제 명확화</li>
+                    <li>2순위: 보안 및 개인정보 보호 정책 강조</li>
+                    <li>3순위: 온보딩 튜토리얼 추가</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="source">
+            분석 일시: 2026년 5월 14일 | 크롬 직접 분석 | 출처: https://www.subtrac.kr/
+        </div>
+    </div>
+
+    <script>
+        const themeToggle = document.getElementById('themeToggle');
+        const htmlElement = document.documentElement;
+        const savedTheme = localStorage.getItem('theme') || 'light';
+
+        if (savedTheme === 'dark') {
+            htmlElement.classList.add('dark-mode');
+            themeToggle.textContent = '🌙';
+        } else {
+            themeToggle.textContent = '☀️';
+        }
+
+        themeToggle.addEventListener('click', () => {
+            htmlElement.classList.toggle('dark-mode');
+            const isDarkMode = htmlElement.classList.contains('dark-mode');
+            localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+            themeToggle.textContent = isDarkMode ? '🌙' : '☀️';
+        });
+    </script>
+</body>
+</html>

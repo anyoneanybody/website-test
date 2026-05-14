@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>김비서 통합 대시보드</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'MS Sans Serif', Arial, sans-serif;
+            padding: 20px;
+            background: #000000;
+            color: #000000;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* 메인 헤더 */
+        .main-header {
+            background: #c0c0c0;
+            border: 2px solid;
+            border-color: #dfdfdf #808080 #808080 #dfdfdf;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .main-header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: #000000;
+            margin-bottom: 10px;
+        }
+
+        .main-header p {
+            font-size: 14px;
+            color: #000000;
+        }
+
+        /* 탭 네비게이션 */
+        .tab-navigation {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: #c0c0c0;
+            color: #000000;
+            border: 2px solid;
+            border-color: #dfdfdf #808080 #808080 #dfdfdf;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            font-family: 'MS Sans Serif', Arial, sans-serif;
+            transition: none;
+        }
+
+        .tab-btn:hover {
+            background: #c0c0c0;
+        }
+
+        .tab-btn.active {
+            border-color: #808080 #dfdfdf #dfdfdf #808080;
+            background: #c0c0c0;
+        }
+
+        .tab-btn:active {
+            border-color: #808080 #dfdfdf #dfdfdf #808080;
+        }
+
+        /* 탭 콘텐츠 */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* 섹션 카드 */
+        .card {
+            background: #c0c0c0;
+            border: 2px solid;
+            border-color: #dfdfdf #808080 #808080 #dfdfdf;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card h2 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #000000;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #808080;
+            padding-bottom: 10px;
+        }
+
+        .card h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #000000;
+            margin: 15px 0 10px 0;
+        }
+
+        /* 기능 항목 */
+        .feature-item {
+            background: #ffffff;
+            border: 1px solid #808080;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+
+        .feature-item h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #000000;
+            margin-bottom: 5px;
+        }
+
+        .feature-item p {
+            font-size: 13px;
+            color: #000000;
+            line-height: 1.5;
+        }
+
+        /* 할 일 목록 */
+        .todo-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .todo-item {
+            display: flex;
+            gap: 10px;
+            padding: 10px;
+            background: #ffffff;
+            border: 1px solid #808080;
+        }
+
+        .todo-checkbox {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+            accent-color: #000080;
+        }
+
+        .todo-content {
+            flex: 1;
+        }
+
+        .todo-title {
+            font-size: 13px;
+            font-weight: 500;
+            color: #000000;
+            margin-bottom: 3px;
+        }
+
+        .todo-meta {
+            font-size: 11px;
+            color: #000000;
+        }
+
+        /* 테이블 */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+            background: #ffffff;
+        }
+
+        .data-table th {
+            background: #c0c0c0;
+            color: #000000;
+            padding: 10px;
+            text-align: left;
+            font-weight: 600;
+            border: 1px solid #808080;
+            font-size: 13px;
+        }
+
+        .data-table td {
+            padding: 10px;
+            border: 1px solid #dfdfdf;
+            color: #000000;
+            font-size: 13px;
+        }
+
+        .data-table tr:hover {
+            background: #ffffff;
+        }
+
+        /* 그리드 레이아웃 */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .info-box {
+            background: #ffffff;
+            border: 1px solid #808080;
+            padding: 15px;
+        }
+
+        .info-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #000000;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            font-size: 14px;
+            font-weight: 500;
+            color: #000000;
+        }
+
+        /* 프로젝트 진행률 */
+        .project-item {
+            margin-bottom: 15px;
+        }
+
+        .project-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #000000;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background: #dfdfdf;
+            border: 1px solid #808080;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #000080;
+        }
+
+        .project-meta {
+            font-size: 11px;
+            color: #000000;
+            margin-top: 3px;
+        }
+
+        /* 매출 카드 */
+        .sales-card {
+            background: #c0c0c0;
+            border: 2px solid;
+            border-color: #dfdfdf #808080 #808080 #dfdfdf;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .sales-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #000000;
+            margin-bottom: 5px;
+        }
+
+        .sales-label {
+            font-size: 12px;
+            color: #000000;
+        }
+
+        /* 캔버스 */
+        canvas {
+            width: 100%;
+            background: #ffffff;
+            border: 1px solid #808080;
+            margin: 10px 0;
+        }
+
+        .legend {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+            font-size: 12px;
+            color: #000000;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border: 1px solid #000000;
+        }
+
+        /* 점수 섹션 */
+        .score-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            font-size: 13px;
+            color: #000000;
+            border-bottom: 1px solid #dfdfdf;
+        }
+
+        .score-item:last-child {
+            border-bottom: none;
+            font-weight: 600;
+        }
+
+        .score-bar {
+            width: 150px;
+            height: 6px;
+            background: #dfdfdf;
+            border: 1px solid #808080;
+            overflow: hidden;
+        }
+
+        .score-fill {
+            height: 100%;
+            background: #000080;
+        }
+
+        /* 버튼 */
+        .btn {
+            background: #c0c0c0;
+            color: #000000;
+            border: 2px solid;
+            border-color: #dfdfdf #808080 #808080 #dfdfdf;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            font-family: 'MS Sans Serif', Arial, sans-serif;
+        }
+
+        .btn:hover {
+            background: #c0c0c0;
+        }
+
+        .btn:active {
+            border-color: #808080 #dfdfdf #dfdfdf #808080;
+        }
+
+        /* 리스트 */
+        ul {
+            margin-left: 20px;
+            color: #000000;
+        }
+
+        li {
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        /* 반응형 */
+        @media (max-width: 1024px) {
+            .grid-3 {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .grid-2,
+            .grid-3 {
+                grid-template-columns: 1fr;
+            }
+
+            .tab-navigation {
+                flex-direction: column;
+            }
+
+            .tab-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 메인 헤더 -->
+        <div class="main-header">
+            <h1>🖥️ 김비서 통합 대시보드</h1>
+            <p>모든 업무 정보를 한 곳에서 관리하세요</p>
+        </div>
+
+        <!-- 탭 네비게이션 -->
+        <div class="tab-navigation">
+            <button class="tab-btn active" onclick="switchTab('intro')">소개</button>
+            <button class="tab-btn" onclick="switchTab('dashboard')">대시보드</button>
+            <button class="tab-btn" onclick="switchTab('meeting')">회의록</button>
+            <button class="tab-btn" onclick="switchTab('chart')">매출 현황</button>
+            <button class="tab-btn" onclick="switchTab('report')">사이트 분석</button>
+        </div>
+
+        <!-- 소개 섹션 -->
+        <div id="intro" class="tab-content active">
+            <div class="card">
+                <h2>📋 김비서를 소개합니다</h2>
+                <p style="font-size: 14px; margin-bottom: 15px;">당신의 업무를 더 효율적으로 관리해주는 AI 어시스턴트</p>
+
+                <div class="feature-item">
+                    <h4>📋 업무 관리</h4>
+                    <p>할 일 목록을 한눈에 보고 우선순위별로 정렬해 효율적으로 관리합니다.</p>
+                </div>
+                <div class="feature-item">
+                    <h4>📅 스케줄 관리</h4>
+                    <p>주간 일정을 체계적으로 정리하고 중요한 미팅과 마감일을 놓치지 않습니다.</p>
+                </div>
+                <div class="feature-item">
+                    <h4>📊 성과 분석</h4>
+                    <p>프로젝트 진행률과 매출 현황을 실시간으로 모니터링하고 의사결정을 돕습니다.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 대시보드 섹션 -->
+        <div id="dashboard" class="tab-content">
+            <div class="card">
+                <h2>📋 할 일 목록</h2>
+                <div class="todo-list">
+                    <div class="todo-item">
+                        <input type="checkbox" class="todo-checkbox">
+                        <div class="todo-content">
+                            <div class="todo-title">3월 프로모션 기획안 작성</div>
+                            <div class="todo-meta">높음 • 진행중 • 3/12까지</div>
+                        </div>
+                    </div>
+                    <div class="todo-item">
+                        <input type="checkbox" class="todo-checkbox">
+                        <div class="todo-content">
+                            <div class="todo-title">인플루언서 미팅 일정 잡기</div>
+                            <div class="todo-meta">높음 • 대기 • 3/14까지</div>
+                        </div>
+                    </div>
+                    <div class="todo-item">
+                        <input type="checkbox" class="todo-checkbox">
+                        <div class="todo-content">
+                            <div class="todo-title">영상 광고 3개 추가 제작</div>
+                            <div class="todo-meta">보통 • 진행중 • 3/14까지</div>
+                        </div>
+                    </div>
+                    <div class="todo-item">
+                        <input type="checkbox" class="todo-checkbox">
+                        <div class="todo-content">
+                            <div class="todo-title">4월 신제품 티저 콘텐츠 기획</div>
+                            <div class="todo-meta">높음 • 대기 • 3/21까지</div>
+                        </div>
+                    </div>
+                    <div class="todo-item">
+                        <input type="checkbox" class="todo-checkbox">
+                        <div class="todo-content">
+                            <div class="todo-title">워크숍 후기 작성하기</div>
+                            <div class="todo-meta">높음 • 대기 • 5/16까지</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>📅 이번 주 일정 (3월 10~14일)</h2>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 12%;">요일</th>
+                            <th style="width: 15%;">시간</th>
+                            <th style="width: 73%;">일정</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td rowspan="2"><strong>월</strong></td>
+                            <td>10:00</td>
+                            <td>마케팅팀 주간회의</td>
+                        </tr>
+                        <tr>
+                            <td>14:00</td>
+                            <td>신제품 런칭 킥오프 미팅</td>
+                        </tr>
+                        <tr>
+                            <td rowspan="4"><strong>화</strong></td>
+                            <td>09:00</td>
+                            <td>3월 프로모션 기획안 마감</td>
+                        </tr>
+                        <tr>
+                            <td>11:00</td>
+                            <td>디자인팀 협업 미팅</td>
+                        </tr>
+                        <tr>
+                            <td>15:00</td>
+                            <td>파트너사 계약서 검토</td>
+                        </tr>
+                        <tr>
+                            <td>19:00</td>
+                            <td>클로드 코드 워크숍 참석</td>
+                        </tr>
+                        <tr>
+                            <td rowspan="3"><strong>수</strong></td>
+                            <td>10:00</td>
+                            <td>인플루언서 미팅</td>
+                        </tr>
+                        <tr>
+                            <td>14:00</td>
+                            <td>고객 설문 결과 공유 미팅</td>
+                        </tr>
+                        <tr>
+                            <td>16:00</td>
+                            <td>콘텐츠 편집 회의</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="grid-2">
+                <div class="card">
+                    <h2>📊 프로젝트 진행률</h2>
+                    <div class="project-item">
+                        <div class="project-header">
+                            <span>봄맞이 프로모션</span>
+                            <span>65%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 65%;"></div>
+                        </div>
+                        <div class="project-meta">진행중 • 김대리</div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-header">
+                            <span>신제품 런칭 캠페인</span>
+                            <span>20%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 20%;"></div>
+                        </div>
+                        <div class="project-meta">준비중 • 정팀장</div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-header">
+                            <span>유튜브 채널 리뉴얼</span>
+                            <span>80%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 80%;"></div>
+                        </div>
+                        <div class="project-meta">마무리 • 박사원</div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-header">
+                            <span>홈페이지 리뉴얼</span>
+                            <span>45%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 45%;"></div>
+                        </div>
+                        <div class="project-meta">진행중 • 이과장</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>💰 매출 요약</h2>
+                    <div class="grid-2">
+                        <div class="sales-card">
+                            <div class="sales-value">38.5억</div>
+                            <div class="sales-label">총 매출액</div>
+                        </div>
+                        <div class="sales-card">
+                            <div class="sales-value">894건</div>
+                            <div class="sales-label">총 판매량</div>
+                        </div>
+                        <div class="sales-card">
+                            <div class="sales-value">7개</div>
+                            <div class="sales-label">판매 제품 수</div>
+                        </div>
+                        <div class="sales-card">
+                            <div class="sales-value">4개</div>
+                            <div class="sales-label">운영 지역</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 회의록 섹션 -->
+        <div id="meeting" class="tab-content">
+            <div class="card">
+                <h2>📋 회의 결과 보고서</h2>
+
+                <h3>회의 기본 정보</h3>
+                <div class="grid-3">
+                    <div class="info-box">
+                        <div class="info-label">회의명</div>
+                        <div class="info-value">마케팅팀 주간회의</div>
+                    </div>
+                    <div class="info-box">
+                        <div class="info-label">날짜</div>
+                        <div class="info-value">2026년 3월 10일 (월)</div>
+                    </div>
+                    <div class="info-box">
+                        <div class="info-label">참석자</div>
+                        <div class="info-value">김대리, 이과장, 박사원, 정팀장</div>
+                    </div>
+                </div>
+
+                <h3>📌 논의 내용 요약</h3>
+                <div style="background: #ffffff; border: 1px solid #808080; padding: 15px; margin-bottom: 15px;">
+                    <p style="font-size: 13px; line-height: 1.6; color: #000000; white-space: pre-wrap;">• SNS 광고 캠페인 A/B 테스트 결과 분석 완료
+  - B안(영상형)이 A안(이미지형) 대비 클릭률 2.3배 우수
+  - B안 기반 광고 전략으로 방향 확정
+
+• 콘텐츠 제작 및 협업 진행 현황
+  - 블로그 콘텐츠 3건 발행 완료
+  - 인플루언서 협업 제안서 3곳 발송, 1곳 회신 (푸드스타일리 김OO)
+
+• 4월 신제품 런칭 전략 논의
+  - 사전 티저 콘텐츠 시작 시점 결정 필요
+  - 경쟁사 C사 신규 캠페인 분석 진행</p>
+                </div>
+
+                <h3>✅ 액션 아이템</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 15%;">담당자</th>
+                            <th style="width: 50%;">할 일</th>
+                            <th style="width: 35%;">기한</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>김대리</strong></td>
+                            <td>3월 프로모션 기획안 초안 작성</td>
+                            <td>2026년 3월 12일 (수)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>이과장</strong></td>
+                            <td>인플루언서 미팅 일정 잡기</td>
+                            <td>2026년 3월 14일 (금)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>박사원</strong></td>
+                            <td>B안 기반으로 영상 광고 3개 추가 제작</td>
+                            <td>2026년 3월 14일 (금)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>박사원</strong></td>
+                            <td>경쟁사 C사 신규 캠페인 분석</td>
+                            <td>진행 중</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 매출 현황 섹션 -->
+        <div id="chart" class="tab-content">
+            <div class="card">
+                <h2>📊 매출 분석 차트</h2>
+
+                <h3>📈 월별 매출 추이</h3>
+                <canvas id="lineChart"></canvas>
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #000080;"></div>
+                        <span>일별 매출액</span>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 25px;">📊 제품별 매출 비교</h3>
+                <canvas id="barChart"></canvas>
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #000080;"></div>
+                        <span>누적 매출액</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 사이트 분석 섹션 -->
+        <div id="report" class="tab-content">
+            <div class="card">
+                <h2>🔍 SubTrackr 사이트 분석 리포트</h2>
+                <p style="font-size: 13px; margin-bottom: 15px;">구독 관리 플랫폼의 UX/UI 및 서비스 분석</p>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                    <div style="background: #ffffff; border: 1px solid #808080; padding: 15px;">
+                        <h3 style="font-size: 14px; margin-bottom: 10px;">🏗️ 사이트 구조</h3>
+                        <ul style="margin-left: 15px;">
+                            <li>헤더: 로그인 / 설정 버튼 우측 상단 배치</li>
+                            <li>히어로 섹션: 핵심 메시지 + CTA 버튼</li>
+                            <li>대시보드 영역: 통계 카드 (3개 섹션)</li>
+                            <li>액션 섹션: AI 감지 / 새 구독 추가</li>
+                            <li>구독 관리 인터페이스: 필터 & 버튼 그룹</li>
+                            <li>블로그 섹션: 구독 관리 팁 및 가이드</li>
+                        </ul>
+                    </div>
+
+                    <div style="background: #ffffff; border: 1px solid #808080; padding: 15px;">
+                        <h3 style="font-size: 14px; margin-bottom: 10px;">🎨 디자인 특징</h3>
+                        <p style="font-size: 12px; line-height: 1.5;"><strong>색상:</strong> 다크모드 기반, 주황색/파란색 강조</p>
+                        <p style="font-size: 12px; line-height: 1.5;"><strong>배경:</strong> 순흑색(#000) - 고대비, 세련됨</p>
+                        <p style="font-size: 12px; line-height: 1.5;"><strong>강조색:</strong> 주황색 그라디언트 (#ff8c42)</p>
+                        <p style="font-size: 12px; line-height: 1.5;"><strong>타이포그래피:</strong> 산세리프, 명확한 계층 구조</p>
+                        <p style="font-size: 12px; line-height: 1.5;"><strong>레이아웃:</strong> 카드 기반, 충분한 여백, 반응형</p>
+                        <p style="font-size: 12px; line-height: 1.5;"><strong>아이콘:</strong> 정보 제공용 인포마크(ⓘ) 활용</p>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                    <div style="background: #ffffff; border: 1px solid #808080; padding: 15px;">
+                        <h3 style="font-size: 14px; margin-bottom: 10px;">✅ 강점 및 잘한 점</h3>
+                        <ul style="margin-left: 15px;">
+                            <li><strong>깔끔한 대시보드:</strong> 핵심 정보 한눈에 파악</li>
+                            <li><strong>다크모드 기본:</strong> 눈 건강 배려, 세련된 느낌</li>
+                            <li><strong>명확한 CTA:</strong> 다음 단계가 명확함</li>
+                            <li><strong>한글 인터페이스:</strong> 한국 사용자 맞춤</li>
+                            <li><strong>AI 기반 자동화:</strong> 사용자 편의성 극대화</li>
+                            <li><strong>정보 아이콘 활용:</strong> 추가 정보 접근성 좋음</li>
+                        </ul>
+                    </div>
+
+                    <div style="background: #ffffff; border: 1px solid #808080; padding: 15px;">
+                        <h3 style="font-size: 14px; margin-bottom: 10px;">💡 개선 제안</h3>
+                        <ul style="margin-left: 15px;">
+                            <li><strong>기능 설명 강화:</strong> 각 기능별 자세한 설명 필요</li>
+                            <li><strong>무료/유료 구분:</strong> 요금제 명시 필요</li>
+                            <li><strong>보안 정보:</strong> 데이터 보호 정책 강조</li>
+                            <li><strong>FAQ 섹션:</strong> 자주 묻는 질문 추가</li>
+                            <li><strong>사용 사례:</strong> 실제 사용자 사례 추가</li>
+                            <li><strong>온보딩 개선:</strong> 초기 사용자 가이드 강화</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3>📊 종합 평가</h3>
+                <div style="background: #ffffff; border: 1px solid #808080; padding: 15px;">
+                    <div class="score-item">
+                        <span>사용자 경험 (UX)</span>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <div class="score-bar" style="width: 150px;">
+                                <div class="score-fill" style="width: 88%;"></div>
+                            </div>
+                            <span>8.8/10</span>
+                        </div>
+                    </div>
+                    <div class="score-item">
+                        <span>시각 디자인 (UI)</span>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <div class="score-bar" style="width: 150px;">
+                                <div class="score-fill" style="width: 87%;"></div>
+                            </div>
+                            <span>8.7/10</span>
+                        </div>
+                    </div>
+                    <div class="score-item">
+                        <span>기능 충실도</span>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <div class="score-bar" style="width: 150px;">
+                                <div class="score-fill" style="width: 82%;"></div>
+                            </div>
+                            <span>8.2/10</span>
+                        </div>
+                    </div>
+                    <div class="score-item">
+                        <span>가치 제안 명확성</span>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <div class="score-bar" style="width: 150px;">
+                                <div class="score-fill" style="width: 85%;"></div>
+                            </div>
+                            <span>8.5/10</span>
+                        </div>
+                    </div>
+                    <div class="score-item">
+                        <span>정보 아키텍처</span>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <div class="score-bar" style="width: 150px;">
+                                <div class="score-fill" style="width: 86%;"></div>
+                            </div>
+                            <span>8.6/10</span>
+                        </div>
+                    </div>
+                    <div class="score-item" style="border-top: 2px solid #808080; padding-top: 10px;">
+                        <strong>종합 평가</strong>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <div class="score-bar" style="width: 150px;">
+                                <div class="score-fill" style="width: 86%;"></div>
+                            </div>
+                            <span style="font-weight: 600;">8.6/10</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // CSV 데이터
+        const csvData = `날짜,제품,카테고리,수량,단가,매출액,지역
+2026-01-05,무선 이어폰,전자기기,45,89000,4005000,서울
+2026-01-05,보조배터리,전자기기,32,35000,1120000,서울
+2026-01-05,텀블러,생활용품,78,25000,1950000,부산
+2026-01-08,무선 이어폰,전자기기,52,89000,4628000,서울
+2026-01-08,블루투스 스피커,전자기기,18,120000,2160000,대구
+2026-01-08,텀블러,생활용품,65,25000,1625000,서울
+2026-01-12,보조배터리,전자기기,41,35000,1435000,부산
+2026-01-12,무선 충전기,전자기기,29,45000,1305000,서울
+2026-01-12,에코백,생활용품,93,15000,1395000,대구
+2026-01-15,무선 이어폰,전자기기,38,89000,3382000,부산
+2026-01-15,블루투스 스피커,전자기기,22,120000,2640000,서울
+2026-01-15,텀블러,생활용품,84,25000,2100000,서울
+2026-01-19,보조배터리,전자기기,55,35000,1925000,대구
+2026-01-19,에코백,생활용품,110,15000,1650000,서울
+2026-01-19,무선 충전기,전자기기,33,45000,1485000,부산
+2026-01-22,무선 이어폰,전자기기,61,89000,5429000,서울
+2026-01-22,텀블러,생활용품,72,25000,1800000,대구
+2026-01-22,블루투스 스피커,전자기기,15,120000,1800000,부산
+2026-01-26,보조배터리,전자기기,48,35000,1680000,서울`;
+
+        function parseCSV(data) {
+            const lines = data.trim().split('\n');
+            const headers = lines[0].split(',');
+            const result = [];
+            for (let i = 1; i < lines.length; i++) {
+                const row = lines[i].split(',');
+                const obj = {};
+                headers.forEach((header, index) => {
+                    obj[header] = row[index];
+                });
+                result.push(obj);
+            }
+            return result;
+        }
+
+        const data = parseCSV(csvData);
+
+        function formatNumber(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        function getDailySales() {
+            const dailySales = {};
+            data.forEach(row => {
+                const date = row['날짜'];
+                const sales = parseInt(row['매출액']);
+                dailySales[date] = (dailySales[date] || 0) + sales;
+            });
+            return Object.entries(dailySales).map(([date, sales]) => ({
+                date: date.slice(5),
+                sales: sales
+            })).sort((a, b) => a.date.localeCompare(b.date));
+        }
+
+        function getProductSales() {
+            const productSales = {};
+            data.forEach(row => {
+                const product = row['제품'];
+                const sales = parseInt(row['매출액']);
+                productSales[product] = (productSales[product] || 0) + sales;
+            });
+            return Object.entries(productSales).map(([product, sales]) => ({
+                product: product,
+                sales: sales
+            })).sort((a, b) => b.sales - a.sales);
+        }
+
+        const dailyData = getDailySales();
+        const productData = getProductSales();
+
+        function drawLineChart() {
+            const canvas = document.getElementById('lineChart');
+            const ctx = canvas.getContext('2d');
+            const dpr = window.devicePixelRatio || 1;
+
+            canvas.width = canvas.offsetWidth * dpr;
+            canvas.height = 300 * dpr;
+            ctx.scale(dpr, dpr);
+
+            const width = canvas.offsetWidth;
+            const height = 300;
+            const padding = { top: 20, right: 20, bottom: 60, left: 60 };
+            const graphWidth = width - padding.left - padding.right;
+            const graphHeight = height - padding.top - padding.bottom;
+
+            ctx.fillStyle = 'transparent';
+            ctx.fillRect(0, 0, width, height);
+
+            const maxSales = Math.max(...dailyData.map(d => d.sales));
+            const yScale = graphHeight / maxSales;
+
+            ctx.strokeStyle = '#000000';
+            ctx.fillStyle = '#000000';
+            ctx.font = '12px MS Sans Serif';
+            ctx.textAlign = 'right';
+
+            for (let i = 0; i <= 5; i++) {
+                const y = padding.top + graphHeight - (graphHeight / 5) * i;
+                const value = Math.floor((maxSales / 5) * i);
+
+                ctx.beginPath();
+                ctx.moveTo(padding.left, y);
+                ctx.lineTo(width - padding.right, y);
+                ctx.stroke();
+
+                ctx.fillText(formatNumber(value), padding.left - 10, y + 4);
+            }
+
+            ctx.textAlign = 'center';
+            ctx.fillStyle = '#000000';
+            dailyData.forEach((d, i) => {
+                const x = padding.left + (graphWidth / (dailyData.length - 1)) * i;
+                ctx.fillText(d.date, x, height - padding.bottom + 20);
+            });
+
+            ctx.strokeStyle = '#000080';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+
+            dailyData.forEach((d, i) => {
+                const x = padding.left + (graphWidth / (dailyData.length - 1)) * i;
+                const y = padding.top + graphHeight - d.sales * yScale;
+
+                if (i === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            });
+            ctx.stroke();
+
+            ctx.fillStyle = '#000080';
+            dailyData.forEach((d, i) => {
+                const x = padding.left + (graphWidth / (dailyData.length - 1)) * i;
+                const y = padding.top + graphHeight - d.sales * yScale;
+
+                ctx.beginPath();
+                ctx.arc(x, y, 5, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#000000';
+                ctx.font = 'bold 11px MS Sans Serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(formatNumber(Math.floor(d.sales / 1000000)) + '억', x, y - 12);
+                ctx.fillStyle = '#000080';
+            });
+
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(padding.left, padding.top);
+            ctx.lineTo(padding.left, height - padding.bottom);
+            ctx.lineTo(width - padding.right, height - padding.bottom);
+            ctx.stroke();
+        }
+
+        function drawBarChart() {
+            const canvas = document.getElementById('barChart');
+            const ctx = canvas.getContext('2d');
+            const dpr = window.devicePixelRatio || 1;
+
+            canvas.width = canvas.offsetWidth * dpr;
+            canvas.height = 300 * dpr;
+            ctx.scale(dpr, dpr);
+
+            const width = canvas.offsetWidth;
+            const height = 300;
+            const padding = { top: 20, right: 20, bottom: 80, left: 60 };
+            const graphWidth = width - padding.left - padding.right;
+            const graphHeight = height - padding.top - padding.bottom;
+
+            const maxSales = Math.max(...productData.map(p => p.sales));
+            const barWidth = (graphWidth - productData.length * 10) / productData.length;
+            const yScale = graphHeight / maxSales;
+
+            ctx.strokeStyle = '#000000';
+            ctx.fillStyle = '#000000';
+            ctx.font = '12px MS Sans Serif';
+            ctx.textAlign = 'right';
+
+            for (let i = 0; i <= 5; i++) {
+                const y = padding.top + graphHeight - (graphHeight / 5) * i;
+                const value = Math.floor((maxSales / 5) * i);
+
+                ctx.beginPath();
+                ctx.moveTo(padding.left, y);
+                ctx.lineTo(width - padding.right, y);
+                ctx.stroke();
+
+                ctx.fillText(formatNumber(value), padding.left - 10, y + 4);
+            }
+
+            productData.forEach((p, i) => {
+                const x = padding.left + (barWidth + 10) * i + 5;
+                const barHeight = p.sales * yScale;
+                const y = padding.top + graphHeight - barHeight;
+
+                ctx.fillStyle = '#000080';
+                ctx.fillRect(x, y, barWidth, barHeight);
+
+                ctx.fillStyle = '#000000';
+                ctx.font = 'bold 11px MS Sans Serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(formatNumber(Math.floor(p.sales / 1000000)) + '억', x + barWidth / 2, y - 8);
+
+                ctx.fillStyle = '#000000';
+                ctx.font = '11px MS Sans Serif';
+                ctx.save();
+                ctx.translate(x + barWidth / 2, height - padding.bottom + 15);
+                ctx.rotate(-Math.PI / 6);
+                ctx.textAlign = 'right';
+                ctx.fillText(p.product, 0, 0);
+                ctx.restore();
+            });
+
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(padding.left, padding.top);
+            ctx.lineTo(padding.left, height - padding.bottom);
+            ctx.lineTo(width - padding.right, height - padding.bottom);
+            ctx.stroke();
+        }
+
+        function switchTab(tabName) {
+            // 모든 탭 콘텐츠 숨기기
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.classList.remove('active'));
+
+            // 모든 버튼 비활성화
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+
+            // 선택한 탭 활성화
+            document.getElementById(tabName).classList.add('active');
+
+            // 선택한 버튼 활성화
+            event.target.classList.add('active');
+
+            // 차트 탭일 때만 차트 그리기
+            if (tabName === 'chart') {
+                setTimeout(() => {
+                    drawLineChart();
+                    drawBarChart();
+                }, 100);
+            }
+        }
+
+        // 초기 로드
+        window.addEventListener('load', () => {
+            drawLineChart();
+            drawBarChart();
+        });
+
+        // 리사이즈 시 차트 다시 그리기
+        window.addEventListener('resize', () => {
+            if (document.getElementById('chart').classList.contains('active')) {
+                drawLineChart();
+                drawBarChart();
+            }
+        });
+    </script>
+</body>
+</html>

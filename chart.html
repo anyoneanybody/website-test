@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>매출 분석 차트</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            color-scheme: light;
+        }
+
+        html.dark-mode {
+            color-scheme: dark;
+        }
+
+        body {
+            font-family: 'MS Sans Serif', Arial, sans-serif;
+            padding: 30px 20px;
+            background: #000000;
+            min-height: 100vh;
+            color: #000000;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* 모드 토글 */
+        .theme-toggle {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            backdrop-filter: blur(10px);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: scale(1.1);
+        }
+
+        html.dark-mode .theme-toggle {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            color: #fff;
+        }
+
+        .header-nav {
+            margin-bottom: 30px;
+        }
+
+        .back-link {
+            color: #0000ff;
+            text-decoration: underline;
+            font-size: 16px;
+            font-weight: 400;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: none;
+            opacity: 1;
+        }
+
+        .back-link:hover {
+            opacity: 1;
+            transform: none;
+        }
+
+        h1 {
+            color: #000000;
+            font-size: 32px;
+            margin-bottom: 40px;
+            text-shadow: none;
+            text-align: center;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        /* 윈도우 98 스타일 카드 */
+        .chart-card {
+            background: #c0c0c0;
+            border: 2px solid;
+            border-color: #dfdfdf #808080 #808080 #dfdfdf;
+            border-radius: 0;
+            padding: 24px;
+            box-shadow: none;
+            color: #000000;
+            transition: none;
+        }
+
+        .chart-card:hover {
+            background: #c0c0c0;
+            box-shadow: none;
+        }
+
+        .chart-card h2 {
+            font-size: 18px;
+            margin-bottom: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #000000;
+        }
+
+        canvas {
+            width: 100%;
+            height: auto;
+            display: block;
+            background: #ffffff;
+            border-radius: 0;
+            padding: 0;
+            border: 1px solid #808080;
+        }
+
+        .legend {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #808080;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            font-size: 12px;
+            color: #000000;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #000000;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 0;
+            flex-shrink: 0;
+            border: 1px solid #000000;
+        }
+
+        @media (max-width: 768px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .theme-toggle {
+                width: 45px;
+                height: 45px;
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" id="themeToggle" aria-label="모드 전환">☀️</button>
+
+    <div class="container">
+        <div class="header-nav">
+            <a href="dashboard.html" class="back-link">← 대시보드로 돌아가기</a>
+        </div>
+
+        <h1>📊 매출 분석 차트</h1>
+
+        <div class="charts-grid">
+            <!-- 월별 매출 추이 차트 -->
+            <div class="chart-card">
+                <h2>📈 월별 매출 추이</h2>
+                <canvas id="lineChart"></canvas>
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #4a90e2;"></div>
+                        <span>일별 매출액</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 제품별 비교 차트 -->
+            <div class="chart-card">
+                <h2>📊 제품별 매출 비교</h2>
+                <canvas id="barChart"></canvas>
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #27ae60;"></div>
+                        <span>누적 매출액</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // CSV 데이터
+        const csvData = `날짜,제품,카테고리,수량,단가,매출액,지역
+2026-01-05,무선 이어폰,전자기기,45,89000,4005000,서울
+2026-01-05,보조배터리,전자기기,32,35000,1120000,서울
+2026-01-05,텀블러,생활용품,78,25000,1950000,부산
+2026-01-08,무선 이어폰,전자기기,52,89000,4628000,서울
+2026-01-08,블루투스 스피커,전자기기,18,120000,2160000,대구
+2026-01-08,텀블러,생활용품,65,25000,1625000,서울
+2026-01-12,보조배터리,전자기기,41,35000,1435000,부산
+2026-01-12,무선 충전기,전자기기,29,45000,1305000,서울
+2026-01-12,에코백,생활용품,93,15000,1395000,대구
+2026-01-15,무선 이어폰,전자기기,38,89000,3382000,부산
+2026-01-15,블루투스 스피커,전자기기,22,120000,2640000,서울
+2026-01-15,텀블러,생활용품,84,25000,2100000,서울
+2026-01-19,보조배터리,전자기기,55,35000,1925000,대구
+2026-01-19,에코백,생활용품,110,15000,1650000,서울
+2026-01-19,무선 충전기,전자기기,33,45000,1485000,부산
+2026-01-22,무선 이어폰,전자기기,61,89000,5429000,서울
+2026-01-22,텀블러,생활용품,72,25000,1800000,대구
+2026-01-22,블루투스 스피커,전자기기,15,120000,1800000,부산
+2026-01-26,보조배터리,전자기기,48,35000,1680000,서울`;
+
+        // CSV 파싱
+        function parseCSV(data) {
+            const lines = data.trim().split('\n');
+            const headers = lines[0].split(',');
+            const result = [];
+            for (let i = 1; i < lines.length; i++) {
+                const row = lines[i].split(',');
+                const obj = {};
+                headers.forEach((header, index) => {
+                    obj[header] = row[index];
+                });
+                result.push(obj);
+            }
+            return result;
+        }
+
+        const data = parseCSV(csvData);
+
+        // 숫자 포맷팅 함수
+        function formatNumber(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        // 일별 매출 집계
+        function getDailySales() {
+            const dailySales = {};
+            data.forEach(row => {
+                const date = row['날짜'];
+                const sales = parseInt(row['매출액']);
+                dailySales[date] = (dailySales[date] || 0) + sales;
+            });
+            return Object.entries(dailySales).map(([date, sales]) => ({
+                date: date.slice(5), // YYYY-MM-DD → MM-DD
+                sales: sales
+            })).sort((a, b) => a.date.localeCompare(b.date));
+        }
+
+        // 제품별 매출 집계
+        function getProductSales() {
+            const productSales = {};
+            data.forEach(row => {
+                const product = row['제품'];
+                const sales = parseInt(row['매출액']);
+                productSales[product] = (productSales[product] || 0) + sales;
+            });
+            return Object.entries(productSales).map(([product, sales]) => ({
+                product: product,
+                sales: sales
+            })).sort((a, b) => b.sales - a.sales);
+        }
+
+        const dailyData = getDailySales();
+        const productData = getProductSales();
+
+        // Canvas 그리기 함수
+        function drawLineChart() {
+            const canvas = document.getElementById('lineChart');
+            const ctx = canvas.getContext('2d');
+            const dpr = window.devicePixelRatio || 1;
+
+            canvas.width = canvas.offsetWidth * dpr;
+            canvas.height = 300 * dpr;
+            ctx.scale(dpr, dpr);
+
+            const width = canvas.offsetWidth;
+            const height = 300;
+            const padding = { top: 20, right: 20, bottom: 60, left: 60 };
+            const graphWidth = width - padding.left - padding.right;
+            const graphHeight = height - padding.top - padding.bottom;
+
+            // 배경
+            ctx.fillStyle = 'transparent';
+            ctx.fillRect(0, 0, width, height);
+
+            // Y축 스케일
+            const maxSales = Math.max(...dailyData.map(d => d.sales));
+            const yScale = graphHeight / maxSales;
+
+            // 그리드 라인 및 Y축 레이블
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+            ctx.font = '12px system-ui';
+            ctx.textAlign = 'right';
+
+            for (let i = 0; i <= 5; i++) {
+                const y = padding.top + graphHeight - (graphHeight / 5) * i;
+                const value = Math.floor((maxSales / 5) * i);
+
+                ctx.beginPath();
+                ctx.moveTo(padding.left, y);
+                ctx.lineTo(width - padding.right, y);
+                ctx.stroke();
+
+                ctx.fillText(formatNumber(value), padding.left - 10, y + 4);
+            }
+
+            // X축 레이블
+            ctx.textAlign = 'center';
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+            dailyData.forEach((d, i) => {
+                const x = padding.left + (graphWidth / (dailyData.length - 1)) * i;
+                ctx.fillText(d.date, x, height - padding.bottom + 20);
+            });
+
+            // 선 그래프 그리기
+            ctx.strokeStyle = '#4a90e2';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+
+            dailyData.forEach((d, i) => {
+                const x = padding.left + (graphWidth / (dailyData.length - 1)) * i;
+                const y = padding.top + graphHeight - d.sales * yScale;
+
+                if (i === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            });
+            ctx.stroke();
+
+            // 데이터 포인트
+            ctx.fillStyle = '#4a90e2';
+            dailyData.forEach((d, i) => {
+                const x = padding.left + (graphWidth / (dailyData.length - 1)) * i;
+                const y = padding.top + graphHeight - d.sales * yScale;
+
+                ctx.beginPath();
+                ctx.arc(x, y, 5, 0, Math.PI * 2);
+                ctx.fill();
+
+                // 값 표시
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+                ctx.font = 'bold 11px system-ui';
+                ctx.textAlign = 'center';
+                ctx.fillText(formatNumber(Math.floor(d.sales / 1000000)) + '억', x, y - 12);
+                ctx.fillStyle = '#4a90e2';
+            });
+
+            // 축
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(padding.left, padding.top);
+            ctx.lineTo(padding.left, height - padding.bottom);
+            ctx.lineTo(width - padding.right, height - padding.bottom);
+            ctx.stroke();
+        }
+
+        function drawBarChart() {
+            const canvas = document.getElementById('barChart');
+            const ctx = canvas.getContext('2d');
+            const dpr = window.devicePixelRatio || 1;
+
+            canvas.width = canvas.offsetWidth * dpr;
+            canvas.height = 300 * dpr;
+            ctx.scale(dpr, dpr);
+
+            const width = canvas.offsetWidth;
+            const height = 300;
+            const padding = { top: 20, right: 20, bottom: 80, left: 60 };
+            const graphWidth = width - padding.left - padding.right;
+            const graphHeight = height - padding.top - padding.bottom;
+
+            const maxSales = Math.max(...productData.map(p => p.sales));
+            const barWidth = (graphWidth - productData.length * 10) / productData.length;
+            const yScale = graphHeight / maxSales;
+
+            // Y축 그리드 및 레이블
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+            ctx.font = '12px system-ui';
+            ctx.textAlign = 'right';
+
+            for (let i = 0; i <= 5; i++) {
+                const y = padding.top + graphHeight - (graphHeight / 5) * i;
+                const value = Math.floor((maxSales / 5) * i);
+
+                ctx.beginPath();
+                ctx.moveTo(padding.left, y);
+                ctx.lineTo(width - padding.right, y);
+                ctx.stroke();
+
+                ctx.fillText(formatNumber(value), padding.left - 10, y + 4);
+            }
+
+            // 막대 그리기
+            const colors = ['#27ae60', '#229954', '#1e8449', '#196f3d', '#145a32', '#0d3b1f', '#0a2818'];
+            productData.forEach((p, i) => {
+                const x = padding.left + (barWidth + 10) * i + 5;
+                const barHeight = p.sales * yScale;
+                const y = padding.top + graphHeight - barHeight;
+
+                ctx.fillStyle = colors[i % colors.length];
+                ctx.fillRect(x, y, barWidth, barHeight);
+
+                // 값 표시
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+                ctx.font = 'bold 11px system-ui';
+                ctx.textAlign = 'center';
+                ctx.fillText(formatNumber(Math.floor(p.sales / 1000000)) + '억', x + barWidth / 2, y - 8);
+
+                // X축 레이블
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+                ctx.font = '11px system-ui';
+                ctx.save();
+                ctx.translate(x + barWidth / 2, height - padding.bottom + 15);
+                ctx.rotate(-Math.PI / 6);
+                ctx.textAlign = 'right';
+                ctx.fillText(p.product, 0, 0);
+                ctx.restore();
+            });
+
+            // 축
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(padding.left, padding.top);
+            ctx.lineTo(padding.left, height - padding.bottom);
+            ctx.lineTo(width - padding.right, height - padding.bottom);
+            ctx.stroke();
+        }
+
+        // 테마 토글
+        const themeToggle = document.getElementById('themeToggle');
+        const htmlElement = document.documentElement;
+        const savedTheme = localStorage.getItem('theme') || 'light';
+
+        if (savedTheme === 'dark') {
+            htmlElement.classList.add('dark-mode');
+            themeToggle.textContent = '🌙';
+        } else {
+            themeToggle.textContent = '☀️';
+        }
+
+        themeToggle.addEventListener('click', () => {
+            htmlElement.classList.toggle('dark-mode');
+            const isDarkMode = htmlElement.classList.contains('dark-mode');
+            localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+            themeToggle.textContent = isDarkMode ? '🌙' : '☀️';
+        });
+
+        // 초기 렌더링
+        drawLineChart();
+        drawBarChart();
+
+        // 리사이즈 시 다시 그리기
+        window.addEventListener('resize', () => {
+            drawLineChart();
+            drawBarChart();
+        });
+    </script>
+</body>
+</html>

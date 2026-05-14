@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>업무 대시보드</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            color-scheme: light;
+        }
+
+        html.dark-mode {
+            color-scheme: dark;
+        }
+
+        body {
+            font-family: 'MS Sans Serif', Arial, sans-serif;
+            padding: 30px 20px;
+            min-height: 100vh;
+            background: #000000;
+            color: #000000;
+        }
+
+        .header {
+            max-width: 1400px;
+            margin: 0 auto 40px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            position: relative;
+        }
+
+        /* 모드 토글 - 숨김 */
+        .theme-toggle {
+            display: none;
+        }
+
+        .back-link {
+            color: #0000ff;
+            text-decoration: underline;
+            font-size: 16px;
+            font-weight: 400;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: none;
+            opacity: 1;
+        }
+
+        .back-link:hover {
+            opacity: 1;
+            transform: none;
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: #000000;
+            text-shadow: none;
+        }
+
+        /* 네비게이션 메뉴 */
+        .nav-menu {
+            max-width: 1400px;
+            margin: 0 auto 30px;
+            display: flex;
+            gap: 12px;
+            background: #c0c0c0;
+            border: 2px solid;
+            border-color: #dfdfdf #808080 #808080 #dfdfdf;
+            border-radius: 0;
+            padding: 8px;
+            box-shadow: none;
+        }
+
+        .nav-item {
+            flex: 1;
+            padding: 12px 16px;
+            background: #c0c0c0;
+            color: #000000;
+            border: 2px solid;
+            border-color: #dfdfdf #808080 #808080 #dfdfdf;
+            border-radius: 0;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: none;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .nav-item:hover {
+            background: #c0c0c0;
+            color: #000000;
+        }
+
+        .nav-item.active {
+            background: #c0c0c0;
+            color: #000000;
+            border-color: #808080 #dfdfdf #dfdfdf #808080;
+            box-shadow: none;
+        }
+
+        .nav-item.active:hover {
+            box-shadow: none;
+        }
+
+        .dashboard {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
+            gap: 24px;
+        }
+
+        /* 윈도우 98 스타일 카드 */
+        .card {
+            background: #c0c0c0;
+            border: 2px solid;
+            border-color: #dfdfdf #808080 #808080 #dfdfdf;
+            border-radius: 0;
+            padding: 24px;
+            box-shadow: none;
+            transition: none;
+            color: #000000;
+        }
+
+        .card:hover {
+            background: #c0c0c0;
+            box-shadow: none;
+            transform: none;
+        }
+
+        .card h2 {
+            font-size: 18px;
+            margin-bottom: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #000000;
+        }
+
+        /* 할 일 목록 */
+        .todo-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .todo-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px;
+            background: #ffffff;
+            border-radius: 0;
+            border: 1px solid #808080;
+            transition: none;
+        }
+
+        .todo-item:hover {
+            background: #ffffff;
+        }
+
+        .todo-item.high {
+            border-color: #808080;
+        }
+
+        .todo-item.medium {
+            border-color: #808080;
+        }
+
+        .todo-item.low {
+            border-color: #808080;
+        }
+
+        .todo-checkbox {
+            width: 20px;
+            height: 20px;
+            margin-top: 2px;
+            cursor: pointer;
+            flex-shrink: 0;
+            accent-color: #000080;
+        }
+
+        .todo-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .todo-title {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 4px;
+            color: #000000;
+        }
+
+        .todo-meta {
+            font-size: 12px;
+            color: #000000;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        /* 주간 일정 */
+        .schedule-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .schedule-table th {
+            background: #c0c0c0;
+            color: #000000;
+            padding: 10px 8px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 1px solid #808080;
+        }
+
+        .schedule-table td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #dfdfdf;
+            color: #000000;
+        }
+
+        .schedule-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .schedule-time {
+            color: #000000;
+            font-weight: 500;
+            white-space: nowrap;
+            background: #c0c0c0;
+            padding: 2px 8px;
+            border-radius: 0;
+            display: inline-block;
+            border: 1px solid #808080;
+        }
+
+        /* 프로젝트 진행률 */
+        .project-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .project-item {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .project-name {
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            justify-content: space-between;
+            color: #000000;
+        }
+
+        .project-percent {
+            font-size: 14px;
+            font-weight: 600;
+            color: #000000;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #dfdfdf;
+            border-radius: 0;
+            overflow: hidden;
+            border: 1px solid #808080;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #000080;
+            border-radius: 0;
+            transition: width 0.3s ease;
+            box-shadow: none;
+        }
+
+        .project-status {
+            font-size: 12px;
+            color: #000000;
+        }
+
+        /* 매출 요약 */
+        .sales-summary {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .summary-card {
+            background: #c0c0c0;
+            color: #000000;
+            padding: 16px;
+            border-radius: 0;
+            text-align: center;
+            border: 2px solid;
+            border-color: #dfdfdf #808080 #808080 #dfdfdf;
+            box-shadow: none;
+            transition: none;
+            cursor: default;
+        }
+
+        .summary-card:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        .summary-card:nth-child(2) {
+            background: #c0c0c0;
+            box-shadow: none;
+        }
+
+        .summary-card:nth-child(2):hover {
+            box-shadow: none;
+        }
+
+        .summary-card:nth-child(3) {
+            background: #c0c0c0;
+            box-shadow: none;
+        }
+
+        .summary-card:nth-child(3):hover {
+            box-shadow: none;
+        }
+
+        .summary-card:nth-child(4) {
+            background: #c0c0c0;
+            box-shadow: none;
+        }
+
+        .summary-card:nth-child(4):hover {
+            box-shadow: none;
+        }
+
+        .summary-value {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            color: #000000;
+        }
+
+        .summary-label {
+            font-size: 12px;
+            color: #000000;
+        }
+
+        @media (max-width: 1024px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .theme-toggle {
+                width: 45px;
+                height: 45px;
+                font-size: 20px;
+            }
+
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+
+            .sales-summary {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" id="themeToggle" aria-label="모드 전환">☀️</button>
+
+    <!-- 네비게이션 메뉴 -->
+    <nav class="nav-menu">
+        <a href="dashboard.html" class="nav-item active" data-page="dashboard">📊 대시보드</a>
+        <a href="meeting-result.html" class="nav-item" data-page="meeting">📋 회의록</a>
+        <a href="chart.html" class="nav-item" data-page="chart">📈 매출 현황</a>
+        <a href="diagram.svg" class="nav-item" data-page="diagram">🔄 업무 프로세스</a>
+        <a href="report.html" class="nav-item" data-page="report">🔍 사이트 분석</a>
+    </nav>
+
+    <div class="header">
+        <a href="index.html" class="back-link">← 메인</a>
+        <h1>업무 대시보드</h1>
+    </div>
+
+    <div class="dashboard">
+        <!-- 섹션 1: 할 일 목록 -->
+        <div class="card">
+            <h2>📋 할 일 목록</h2>
+            <div class="todo-list">
+                <div class="todo-item high">
+                    <input type="checkbox" class="todo-checkbox">
+                    <div class="todo-content">
+                        <div class="todo-title">3월 프로모션 기획안 작성</div>
+                        <div class="todo-meta">
+                            <span>높음</span>
+                            <span>•</span>
+                            <span>진행중</span>
+                            <span>•</span>
+                            <span>3/12까지</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="todo-item high">
+                    <input type="checkbox" class="todo-checkbox">
+                    <div class="todo-content">
+                        <div class="todo-title">인플루언서 미팅 일정 잡기</div>
+                        <div class="todo-meta">
+                            <span>높음</span>
+                            <span>•</span>
+                            <span>대기</span>
+                            <span>•</span>
+                            <span>3/14까지</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="todo-item medium">
+                    <input type="checkbox" class="todo-checkbox">
+                    <div class="todo-content">
+                        <div class="todo-title">영상 광고 3개 추가 제작</div>
+                        <div class="todo-meta">
+                            <span>보통</span>
+                            <span>•</span>
+                            <span>진행중</span>
+                            <span>•</span>
+                            <span>3/14까지</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="todo-item high">
+                    <input type="checkbox" class="todo-checkbox">
+                    <div class="todo-content">
+                        <div class="todo-title">4월 신제품 티저 콘텐츠 기획</div>
+                        <div class="todo-meta">
+                            <span>높음</span>
+                            <span>•</span>
+                            <span>대기</span>
+                            <span>•</span>
+                            <span>3/21까지</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="todo-item high">
+                    <input type="checkbox" class="todo-checkbox">
+                    <div class="todo-content">
+                        <div class="todo-title">워크숍 후기 작성하기</div>
+                        <div class="todo-meta">
+                            <span>높음</span>
+                            <span>•</span>
+                            <span>대기</span>
+                            <span>•</span>
+                            <span>5/16까지</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 섹션 2: 이번 주 일정 -->
+        <div class="card">
+            <h2>📅 이번 주 일정 (3월 10~14일)</h2>
+            <table class="schedule-table">
+                <thead>
+                    <tr>
+                        <th>요일</th>
+                        <th>시간</th>
+                        <th>일정</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td rowspan="2"><strong>월</strong></td>
+                        <td><span class="schedule-time">10:00</span></td>
+                        <td>마케팅팀 주간회의</td>
+                    </tr>
+                    <tr>
+                        <td><span class="schedule-time">14:00</span></td>
+                        <td>신제품 런칭 킥오프 미팅</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="4"><strong>화</strong></td>
+                        <td><span class="schedule-time">09:00</span></td>
+                        <td>3월 프로모션 기획안 마감</td>
+                    </tr>
+                    <tr>
+                        <td><span class="schedule-time">11:00</span></td>
+                        <td>디자인팀 협업 미팅</td>
+                    </tr>
+                    <tr>
+                        <td><span class="schedule-time">15:00</span></td>
+                        <td>파트너사 계약서 검토</td>
+                    </tr>
+                    <tr>
+                        <td><span class="schedule-time">19:00</span></td>
+                        <td>클로드 코드 워크숍 참석</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="3"><strong>수</strong></td>
+                        <td><span class="schedule-time">10:00</span></td>
+                        <td>인플루언서 미팅</td>
+                    </tr>
+                    <tr>
+                        <td><span class="schedule-time">14:00</span></td>
+                        <td>고객 설문 결과 공유 미팅</td>
+                    </tr>
+                    <tr>
+                        <td><span class="schedule-time">16:00</span></td>
+                        <td>콘텐츠 편집 회의</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 섹션 3: 프로젝트 진행률 -->
+        <div class="card">
+            <h2>📊 프로젝트 진행률</h2>
+            <div class="project-list">
+                <div class="project-item">
+                    <div class="project-name">
+                        <span>봄맞이 프로모션</span>
+                        <span class="project-percent">65%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 65%;"></div>
+                    </div>
+                    <div class="project-status">진행중 • 김대리</div>
+                </div>
+                <div class="project-item">
+                    <div class="project-name">
+                        <span>신제품 런칭 캠페인</span>
+                        <span class="project-percent">20%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 20%;"></div>
+                    </div>
+                    <div class="project-status">준비중 • 정팀장</div>
+                </div>
+                <div class="project-item">
+                    <div class="project-name">
+                        <span>유튜브 채널 리뉴얼</span>
+                        <span class="project-percent">80%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 80%;"></div>
+                    </div>
+                    <div class="project-status">마무리 • 박사원</div>
+                </div>
+                <div class="project-item">
+                    <div class="project-name">
+                        <span>홈페이지 리뉴얼</span>
+                        <span class="project-percent">45%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 45%;"></div>
+                    </div>
+                    <div class="project-status">진행중 • 이과장</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 섹션 4: 매출 요약 -->
+        <div class="card">
+            <h2>💰 매출 요약</h2>
+            <div class="sales-summary">
+                <div class="summary-card">
+                    <div class="summary-value">38.5억</div>
+                    <div class="summary-label">총 매출액</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-value">894건</div>
+                    <div class="summary-label">총 판매량</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-value">7개</div>
+                    <div class="summary-label">판매 제품 수</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-value">4개</div>
+                    <div class="summary-label">운영 지역</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const themeToggle = document.getElementById('themeToggle');
+        const htmlElement = document.documentElement;
+        const savedTheme = localStorage.getItem('theme') || 'light';
+
+        // 초기 테마 설정
+        if (savedTheme === 'dark') {
+            htmlElement.classList.add('dark-mode');
+            themeToggle.textContent = '🌙';
+        } else {
+            themeToggle.textContent = '☀️';
+        }
+
+        // 토글 클릭 이벤트
+        themeToggle.addEventListener('click', () => {
+            htmlElement.classList.toggle('dark-mode');
+            const isDarkMode = htmlElement.classList.contains('dark-mode');
+            localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+            themeToggle.textContent = isDarkMode ? '🌙' : '☀️';
+        });
+
+        // 네비게이션 활성화
+        function activateCurrentNav() {
+            const currentPath = window.location.pathname;
+            const navItems = document.querySelectorAll('.nav-item');
+
+            navItems.forEach(item => {
+                const href = item.getAttribute('href');
+                const fileName = currentPath.split('/').pop() || 'dashboard.html';
+
+                if (href === fileName || (fileName === '' && href === 'dashboard.html')) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+        }
+
+        // 페이지 로드 시 활성화
+        activateCurrentNav();
+
+        // 히스토리 변경 감지
+        window.addEventListener('popstate', activateCurrentNav);
+    </script>
+</body>
+</html>
